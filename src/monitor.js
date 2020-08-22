@@ -4,9 +4,14 @@ const fs = require('fs')
 let folder = fs.readdirSync('./data/')
 folder = folder.filter((file) => { if (file.endsWith('.json')) { return file } })
 let foldercensor = folder.map((file)=> {
+
+    
     let s = file.split("_")
     s.shift()
     return s.join('_')
+    
+    
+   //return file
 })
 
 let screen = blessed.screen()

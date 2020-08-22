@@ -41,16 +41,17 @@ class userTwitch {
         //End Stream
         if (!this.currentStatus && this.previousStauts) {
             console.log(`${this.user} has stoped the streaming. Logs are saved.`)
-            this.saveLogs()
+            await this.saveLogs()
             this.previousStauts = false
             return 0;
         }
     }
 
-    saveLogs() {
+    async saveLogs() {
         if (this.viewsOverTime.length > 0) {
             exportFiles.toCsv(this.viewsOverTime, this.user)
             exportFiles.toJson(this.viewsOverTime, this.user)
+            await exportFiles.toPng(this.viewsOverTime, this.user)
         }
     }
 }

@@ -8,7 +8,35 @@ async function getApiData(userTwitch) {
     return getData.data
 }
 
-console.log(process.env.CLIENT_ID)
+async function getStreamersByCat(category) {
+    let getStreams = []
+    try {
+        let getBearer = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&grant_type=client_credentials`)
+        let headers = {
+            'headers': {
+                'Authorization': `Bearer ${getBearer.data.access_token}`,
+                'Client-ID': process.env.CLIENT_ID,
+                'Accept': 'application/vnd.twitchtv.v5+json'
+            }
+        }
+        for (let i = 0; i < category.length; i++) {
+            let getStream = await axios.get(`https://api.twitch.tv/kraken/streams/?game=${category[i]}&limit=100&language=es`, headers)
+            console.log(getStream.data.streams)
+            for (let j = 0; j < getStream.data.streams.length; j++) {
+                getStreams.push(getStream.data.streams[j].channel.name)
+            }
+        }
+    } catch (error) {
+        console.log(error)
+    }
+
+    return getStreams
+}
+
+/*(async () => {
+    let streams = await getStreamersByCat(["Overwatch", "Valorant", "Counter-Strike: Global Offensive", "Grand Theft Auto V", "Fortnite"])
+})()*/
+
 async function streamerIsOnline(userTwitch) {
     try {
         let getBearer = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&grant_type=client_credentials`)
@@ -38,4 +66,4 @@ async function streamerIsOnline(userTwitch) {
 }
 
 
-module.exports = { streamerIsOnline }
+module.exports = { streamerIsOnline, getStreamersByCat }

@@ -46,7 +46,7 @@
                 },
                 title: {
                     display: true,
-                    text: fileName
+                    text: fileName[0]
                 },
                 scales: {
                     yAxes: [{
@@ -58,6 +58,6 @@
             }
         };
         const image = await canvasRenderService.renderToBuffer(configuration);
-        fs.writeFileSync(`./dataimg/${fileName[0]}.png`, image)
+        fs.writeFileSync(`./dataimg/${fileName}.png`, image)
     }
 })();

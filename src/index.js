@@ -9,7 +9,7 @@
     const userTw = require('./libs/userTwitch');
     const getData = require('./libs/getDataApi');
     const routes = require('./routes/routes');
-    const socketClient = require('socket.io-client')('http://localhost:3000/');
+    const socketClient = require('socket.io-client')('http://localhost:8729/');
     const mongoose = require('mongoose')
     const helmet = require('helmet');
     const bodyParser = require('body-parser');

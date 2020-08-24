@@ -3,6 +3,7 @@
     const express = require('express')
     const socketIo = require('socket.io');
     const app = express()
+    const cors = require('cors')
     const server = http.createServer(app);
     const io = socketIo(server);
     const userTw = require('./libs/userTwitch');
@@ -19,6 +20,7 @@
     })
 
     //app.set('trust proxy', 1) // trust first proxy
+    app.use(cors());
     app.use(session({
         secret: process.env.SESSION || 'supersecret1',
         resave: true,

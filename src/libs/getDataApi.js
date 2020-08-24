@@ -21,7 +21,6 @@ async function getStreamersByCat(category) {
         }
         for (let i = 0; i < category.length; i++) {
             let getStream = await axios.get(`https://api.twitch.tv/kraken/streams/?game=${category[i]}&limit=10&language=es`, headers)
-            console.log(getStream.data.streams)
             for (let j = 0; j < getStream.data.streams.length; j++) {
                 getStreams.push(getStream.data.streams[j].channel.name)
             }

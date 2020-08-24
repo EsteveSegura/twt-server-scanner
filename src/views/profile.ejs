@@ -96,9 +96,9 @@
                                         </tr>
                                     </thead>
                                     <tbody id="table-online">
-                                        <% files.forEach((user) => {  %>
+                                        <% files.forEach((userD) => {  %>
                                         <tr>
-                                            <td> <a href="/profile/<%=screenName%>/<%=user%>"> <%= user %> </a></td>
+                                            <td> <a href="/profile/<%=screenName%>/<%=userD._id%>"> <%= userD.date %> </a></td>
                                         </tr>
                                         <% }); %>
                                     </tbody>

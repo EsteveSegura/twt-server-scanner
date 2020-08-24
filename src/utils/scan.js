@@ -4,7 +4,6 @@
     let users = ["girlazo"]
     //Scan 100 top valorant players
     //users = await getData.getStreamersByCat(["Valorant"]) 
-    console.log(users.length)
     let usersClass = users.map(user => new userTw(user))
 
 

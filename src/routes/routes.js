@@ -1,35 +1,75 @@
 const express = require('express');
 const router = express.Router();
-const fs = require('fs')
+const database = require('../libs/database')
+const secure = require('../libs/auth')
+const jwt = require('jsonwebtoken')
 
-router.get('/', (req, res) => {
-    res.render('index.ejs');
+router.get('/', secure.verifyToken, (req, res) => {
+    req.token = req.session.token;
+    jwt.verify(req.token, process.env.SESSION, (err, authData) => {
+        if (err) {
+            res.redirect('/login')
+        } else {
+            res.render('index.ejs');
+        }
+    });
+
 });
 
-router.get('/profile/:user', (req, res) => {
-    let userData = JSON.parse(fs.readFileSync(`./users/${req.params.user}.json`,'utf8'))
-    let files = fs.readdirSync('./data', 'utf8')
-    let userUrl = req.params.user
-    let filesFiltered = files.filter(file => userUrl == file.split("_")[0])
-    let filesFilteredFormat = filesFiltered.filter(file => file.endsWith(".json"))
-    console.log(filesFilteredFormat)
-    res.render('profile.ejs', {
-        files: filesFilteredFormat,
-        user: userUrl,
-        screenName: req.params.user,
-        userData: userData
+router.get('/profile/:user', secure.verifyToken, async (req, res, next) => {
+    req.token = req.session.token;
+    jwt.verify(req.token, process.env.SESSION, async (err, authData) => {
+        if (err) {
+            res.redirect('/login')
+        } else {
+            let userUrl = req.params.user
+            let databaseResult = await database.getStreamer(userUrl)
+            res.render('profile.ejs', {
+                files: databaseResult.history,
+                user: userUrl,
+                screenName: req.params.user,
+                userData: databaseResult
+            });
+        }
     });
 });
 
-router.get('/profile/:user/:file', (req, res) => {
-    let fileUrl = req.params.file
-    let userData = JSON.parse(fs.readFileSync(`./users/${req.params.user}.json`,'utf8'))
-    let userUrl = req.params.user
-    let json = JSON.parse(fs.readFileSync(`./data/${fileUrl}`,'utf8'))
-    res.render('data.ejs', {
-        user : userUrl,
-        json: json,
-        userData: userData
+router.get('/login', async (req, res, next) => {
+    res.render('login.ejs');
+});
+
+router.post('/login', (req, res) => {
+    let users = [
+        {
+            "user": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+        }
+    ]
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].user == req.body.token) {
+            jwt.sign({ 'user': users[i].user }, process.env.SESSION, (err, token) => {
+                req.session.token = token;
+                res.redirect('/')
+            });
+            break;
+        }
+    }
+});
+
+router.get('/profile/:user/:file', secure.verifyToken, async (req, res, next) => {
+    req.token = req.session.token;
+    jwt.verify(req.token, process.env.SESSION, async (err, authData) => {
+        if (err) {
+            res.redirect('/login')
+        } else {
+            let userUrl = req.params.user
+            let databaseResult = await database.getStreamer(userUrl)
+            let json = databaseResult.history.filter(dataset => dataset._id == req.params.file)
+            res.render('data.ejs', {
+                user: userUrl,
+                json: json[0].data,
+                userData: databaseResult
+            });
+        }
     });
 });
 

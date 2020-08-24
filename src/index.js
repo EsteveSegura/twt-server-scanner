@@ -9,45 +9,62 @@
     const getData = require('./libs/getDataApi');
     const routes = require('./routes/routes');
     const socketClient = require('socket.io-client')('http://localhost:3000/');
+    const mongoose = require('mongoose')
+    const helmet = require('helmet');
+    const bodyParser = require('body-parser');
+    const session = require('express-session')
 
+    mongoose.connect('mongodb://localhost/inspectwitch', { useNewUrlParser: true, useUnifiedTopology: true }).then(() => {
+        console.log("DataBase: OK")
+    })
 
+    //app.set('trust proxy', 1) // trust first proxy
+    app.use(session({
+        secret: process.env.SESSION || 'supersecret1',
+        resave: true,
+        saveUninitialized: true,
+        cookie: { secure: false, maxAge: 6000000000 }
+    }));
+    app.use(helmet());
+    app.use(bodyParser.urlencoded({ extended: true }));
+    app.use(bodyParser.json());
     app.set('views', './views');
     app.set('view engine', 'ejs');
     app.use(express.static('./public'));
     app.use('/', routes);
 
-
     io.on('connection', (socket) => {
         socket.on('dataUpdate', (body) => {
-            console.log(body);
             socket.broadcast.emit('dataUpdate', body);
         })
 
         socket.on('initData', (body) => {
-            console.log(body);
             socket.emit('initData', usersClass);
         })
-
     });
 
-    
     server.listen(3000, () => {
         console.log('Server ON')
     })
 
-    let users = ["girlazo"]
+    let users = ["epsyloncat", "sergioregui", "elbokeron", "elxokas", "sito7", "hitboxking", "sirmaza", "zok3r", "zainita", "paracetamor", "dazrbn", "mery_soldier", "luken", "leviathan", "rickyedit", "katth", "winghaven", "sujagg", "illojuan", "espe", "pettans", "mumusiraneitor", "gonsabellla", "milan926_", "iaaras2", "danielaazuaje_", "reborn_live", "kaquka", "girlazo"]
     //Scan 100 top valorant players
-    users = await getData.getStreamersByCat(["Valorant"])
-    console.log(users.length)
+    //users = await getData.getStreamersByCat(["Valorant"])
     let usersClass = users.map(user => new userTw(user))
 
-
+    for (let i = 0; i < usersClass.length; i++) {
+        try {
+            await usersClass[i].addNewRecord()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+    socketClient.emit('dataUpdate', usersClass)
     setInterval(async () => {
         for (let i = 0; i < usersClass.length; i++) {
             try {
                 await usersClass[i].addNewRecord()
             } catch (error) {
-                console.log(error)
             }
         }
         socketClient.emit('dataUpdate', usersClass)
@@ -61,6 +78,4 @@
         }
         process.exit(1);
     });
-
-
 })()

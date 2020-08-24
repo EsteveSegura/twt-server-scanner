@@ -1,6 +1,6 @@
 const getData = require('../libs/getDataApi');
 const exportFiles = require('./exportFiles');
-const fs = require('fs');
+const database = require('./database');
 
 class userTwitch {
     constructor(user) {
@@ -15,6 +15,7 @@ class userTwitch {
         let broadcastData = await getData.streamerIsOnline(this.user)
         if (broadcastData) {
             this.currentStatus = true
+
             //Starting to stream
             if (this.currentStatus && !this.previousStauts) {
                 console.log(`${this.user} is now streaming`)
@@ -43,7 +44,7 @@ class userTwitch {
 
         //End Stream
         if (!this.currentStatus && this.previousStauts) {
-            console.log(`${this.user} has stoped the streaming. Logs are saved.`)
+            console.log(`${this.user} has stoped the streaming. Logs are saved.`) 
             await this.saveLogs()
             this.previousStauts = false
             return 0;
@@ -51,18 +52,18 @@ class userTwitch {
     }
 
     async createProfile(){
-        let streamData = await getData.dataStreamer(this.user)
-        console.log(streamData)
-        fs.writeFile(`./users/${this.user}.json`, JSON.stringify(streamData), (err) => {
+        database.addStreamer(this.user)
+        /*fs.writeFile(`./users/${this.user}.json`, JSON.stringify(streamData), (err) => {
             console.log(`User data: ${this.user} saved.`)
-        })
+        })*/
     }
 
     async saveLogs() {
         if (this.viewsOverTime.length > 0) {
-            exportFiles.toCsv(this.viewsOverTime, this.user)
-            exportFiles.toJson(this.viewsOverTime, this.user)
-            await exportFiles.toPng(this.viewsOverTime, this.user)
+            await database.addStreamerHistory(this.user, Date.now(), this.viewsOverTime)
+            //exportFiles.toCsv(this.viewsOverTime, this.user)
+            //exportFiles.toJson(this.viewsOverTime, this.user)
+            //await exportFiles.toPng(this.viewsOverTime, this.user)
         }
     }
 }

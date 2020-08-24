@@ -4,7 +4,7 @@
     const socketIo = require('socket.io');
     const app = express()
     const cors = require('cors')
-    const server = http.createServer(app);
+    const server = http.createServer(app).listen(8729);
     const io = socketIo(server);
     const userTw = require('./libs/userTwitch');
     const getData = require('./libs/getDataApi');

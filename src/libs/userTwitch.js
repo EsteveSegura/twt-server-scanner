@@ -1,5 +1,7 @@
 const getData = require('../libs/getDataApi');
-const exportFiles = require('./exportFiles')
+const exportFiles = require('./exportFiles');
+const fs = require('fs');
+
 class userTwitch {
     constructor(user) {
         this.user = user;
@@ -16,6 +18,7 @@ class userTwitch {
             //Starting to stream
             if (this.currentStatus && !this.previousStauts) {
                 console.log(`${this.user} is now streaming`)
+                await this.createProfile()
                 this.viewsOverTime = []
                 this.viewsOverTime.push({
                     viewers: broadcastData.dataFromTwitch.data[0].viewer_count,
@@ -45,6 +48,14 @@ class userTwitch {
             this.previousStauts = false
             return 0;
         }
+    }
+
+    async createProfile(){
+        let streamData = await getData.dataStreamer(this.user)
+        console.log(streamData)
+        fs.writeFile(`./users/${this.user}.json`, JSON.stringify(streamData), (err) => {
+            console.log(`User data: ${this.user} saved.`)
+        })
     }
 
     async saveLogs() {

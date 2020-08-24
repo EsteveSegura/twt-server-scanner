@@ -16,14 +16,14 @@ function toCsv(data, name) {
     }
 
     let currentDate = new Date();
-    let stringDate = `${currentDate.getDay()}-${currentDate.getMonth()}-${currentDate.getFullYear()}_${currentDate.getHours()}-${currentDate.getMinutes()}`
+    let stringDate = `${currentDate.getDate()}-${currentDate.getMonth()}-${currentDate.getFullYear()}_${currentDate.getHours()}-${currentDate.getMinutes()}`
     let fileName = `${name}_${stringDate}`
     fs.writeFileSync(`./data/${fileName}.csv`, bodyString, "utf8")
 }
 
 function toJson(data, name) {
     let currentDate = new Date();
-    let stringDate = `${currentDate.getDay()}-${currentDate.getMonth()}-${currentDate.getFullYear()}_${currentDate.getHours()}-${currentDate.getMinutes()}`
+    let stringDate = `${currentDate.getDate()}-${currentDate.getMonth()}-${currentDate.getFullYear()}_${currentDate.getHours()}-${currentDate.getMinutes()}`
     let fileName = `${name}_${stringDate}`
     try {
         fs.writeFileSync(`./data/${fileName}.json`, JSON.stringify(data), "utf8")
@@ -32,11 +32,12 @@ function toJson(data, name) {
     }
 }
 
+
 async function toPng(data_, name) {
     const width = 900;
     const height = 500;
     let currentDate = new Date();
-    let stringDate = `${currentDate.getDay()}-${currentDate.getMonth()}-${currentDate.getFullYear()}_${currentDate.getHours()}-${currentDate.getMinutes()}`
+    let stringDate = `${currentDate.getDate()}-${currentDate.getMonth()}-${currentDate.getFullYear()}_${currentDate.getHours()}-${currentDate.getMinutes()}`
     let fileName = `${name}_${stringDate}`
     const canvasRenderService = new CanvasRenderService(width, height, (ChartJS) => {
         ChartJS.defaults.global.elements.rectangle.borderWidth = 2;

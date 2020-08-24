@@ -58,6 +58,6 @@
             }
         };
         const image = await canvasRenderService.renderToBuffer(configuration);
-        fs.writeFileSync(`./dataimg/${fileName}.png`, image)
+        fs.writeFileSync(`./dataimg/${folder[i]}.png`, image)
     }
 })();

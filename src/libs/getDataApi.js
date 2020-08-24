@@ -20,7 +20,7 @@ async function getStreamersByCat(category) {
             }
         }
         for (let i = 0; i < category.length; i++) {
-            let getStream = await axios.get(`https://api.twitch.tv/kraken/streams/?game=${category[i]}&limit=100&language=es`, headers)
+            let getStream = await axios.get(`https://api.twitch.tv/kraken/streams/?game=${category[i]}&limit=10&language=es`, headers)
             console.log(getStream.data.streams)
             for (let j = 0; j < getStream.data.streams.length; j++) {
                 getStreams.push(getStream.data.streams[j].channel.name)
@@ -31,6 +31,24 @@ async function getStreamersByCat(category) {
     }
 
     return getStreams
+}
+
+async function dataStreamer(userTwitch){
+    try {
+        let getBearer = await axios.post(`https://id.twitch.tv/oauth2/token?client_id=${process.env.CLIENT_ID}&client_secret=${process.env.CLIENT_SECRET}&grant_type=client_credentials`)
+        let headers = {
+            'headers': {
+                'Authorization': `Bearer ${getBearer.data.access_token}`,
+                'Client-ID': process.env.CLIENT_ID,
+                'Accept': 'application/vnd.twitchtv.v5+json'
+            }
+        }
+        let getId = await axios.get(`https://api.twitch.tv/kraken/users/?login=${userTwitch}`, headers)
+        let getViews = await axios.get(`https://api.twitch.tv/kraken/streams/${getId.data.users[0]._id}`, headers)
+        return getViews.data
+    } catch (error) {
+        return false
+    }
 }
 
 /*(async () => {
@@ -66,4 +84,4 @@ async function streamerIsOnline(userTwitch) {
 }
 
 
-module.exports = { streamerIsOnline, getStreamersByCat }
+module.exports = { streamerIsOnline, getStreamersByCat, dataStreamer }
